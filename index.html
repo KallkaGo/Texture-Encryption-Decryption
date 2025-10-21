@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/ico/firefly.ico" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" type="text/css" href="/src/style.css">
+  <title>Texture ED</title>
+</head>
+
+<body>
+  <div id="app">
+    <div class="container">
+      <h1>🎨 Texture Encryption / Decryption </h1>
+
+      <div class="content">
+        <div class="canvas-wrapper">
+          <div class="loading">Loading...</div>
+          <div class="glCanvas"></div>
+          <div id="statusPanel" class="status" style="display:none;">
+            <div class="status-item">
+              <span>Current State:</span>
+              <span id="stateText" class="value">Original</span>
+            </div>
+            <div class="status-item">
+              <span>Current Offset:</span>
+              <span id="offsetValue" class="value">0</span>
+            </div>
+            <div class="status-item">
+              <span>Scramble Offset:</span>
+              <span id="scrambleOffsetText" class="value">0</span>
+            </div>
+            <div class="status-item">
+              <span>Texture Size:</span>
+              <span id="textureSizeText" class="value">-</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <h2 style="margin-bottom: 15px; font-size: 18px;">Controls</h2>
+
+          <div class="control-group">
+            <label>Offset: <span id="offsetDisplay">0</span></label>
+            <input type="range" id="offsetSlider" min="-0.9" max="0.9" value="0" step="0.01">
+          </div>
+
+          <div class="control-group">
+            <label style="display: flex; align-items: center; gap: 10px;">
+              <input type="checkbox" id="flipY">
+              <span>Flip Y Axis</span>
+            </label>
+          </div>
+          <hr style="border: 1px solid #0f3460; margin: 20px 0;">
+
+          <button id="scrambleBtn" class="btn-scramble">🎲 Scramble Image</button>
+          <button id="restoreBtn" class="btn-restore" disabled>↩️ Restore Image</button>
+          <button id="downloadBtn" class="btn-download">💾 Download PNG</button>
+          <button id="resetBtn" class="btn-reset">🔄 Reset All</button>
+
+          <div class="info" style="margin-top: 20px;">
+            <strong>How to use:</strong><br>
+            • <strong>Scramble:</strong> Scrambled pixels<br>
+            • <strong>Restore:</strong> Apply negative offset to reverse<br>
+            • <strong>Download:</strong> Save current state as PNG<br>
+            • Demonstrates reversible pixel mapping
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script type="module" src="/src/main.ts"></script>
+</body>
+
+</html>
