@@ -1,3 +1,5 @@
+import UPNG from "upng-js";
+
 export default class App {
   private static __ins: App;
   public static get shared() {
@@ -394,7 +396,7 @@ export default class App {
     };
   }
 
-  private downloadImage(filename: string = "texture") {
+  private downloadImage(filename?: string) {
     if (!this.gl || !this.canvas) {
       console.error("WebGL context or canvas not available");
       return this;
@@ -409,82 +411,45 @@ export default class App {
         .toISOString()
         .replace(/[:.]/g, "-")
         .slice(0, -5);
-      const state = this.state.isScrambled
-        ? "scrambled"
-        : this.state.offset !== 0
-        ? `offset${this.state.offset}`
-        : "original";
-      filename = `space-curve-${state}-${timestamp}.png`;
+      filename = `texture-${timestamp}.png`;
     }
 
-    try {
-      // 创建 ArrayBuffer 存储像素数据
-      const pixels = new Uint8Array(width * height * 4);
+    // 创建 ArrayBuffer 存储像素数据
+    const pixels = new Uint8Array(width * height * 4);
+    const invertYPixels = new Uint8Array(width * height * 4);
 
-      // 从 WebGL 帧缓冲读取像素数据
-      this.gl.readPixels(
-        0,
-        0,
-        width,
-        height,
-        this.gl.RGBA,
-        this.gl.UNSIGNED_BYTE,
-        pixels
-      );
+    // 从 WebGL 帧缓冲读取像素数据
+    this.gl.readPixels(
+      0,
+      0,
+      width,
+      height,
+      this.gl.RGBA,
+      this.gl.UNSIGNED_BYTE,
+      pixels
+    );
 
-      // 创建临时的 2D canvas 用于导出
-      const tempCanvas = document.createElement("canvas");
-      tempCanvas.width = width;
-      tempCanvas.height = height;
-      const ctx = tempCanvas.getContext("2d");
+    // WebGL 的原点在左下角，需要垂直翻转
+    for (let y = 0; y < height; y++) {
+      for (let x = 0; x < width; x++) {
+        const srcIdx = (y * width + x) * 4;
+        const dstIdx = ((height - 1 - y) * width + x) * 4;
 
-      if (!ctx) {
-        console.error("Failed to get 2D context");
-        return this;
+        invertYPixels[dstIdx + 0] = pixels[srcIdx + 0]; // R
+        invertYPixels[dstIdx + 1] = pixels[srcIdx + 1]; // G
+        invertYPixels[dstIdx + 2] = pixels[srcIdx + 2]; // B
+        invertYPixels[dstIdx + 3] = pixels[srcIdx + 3]; // A
       }
-
-      // 创建 ImageData
-      const imageData = ctx.createImageData(width, height);
-
-      // WebGL 的原点在左下角，需要垂直翻转
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const srcIdx = (y * width + x) * 4;
-          const dstIdx = ((height - 1 - y) * width + x) * 4;
-
-          imageData.data[dstIdx + 0] = pixels[srcIdx + 0]; // R
-          imageData.data[dstIdx + 1] = pixels[srcIdx + 1]; // G
-          imageData.data[dstIdx + 2] = pixels[srcIdx + 2]; // B
-          imageData.data[dstIdx + 3] = pixels[srcIdx + 3]; // A
-        }
-      }
-
-      // 将 ImageData 写入临时 canvas
-      ctx.putImageData(imageData, 0, 0);
-
-      // 从临时 canvas 导出为 Blob
-      tempCanvas.toBlob((blob) => {
-        if (!blob) {
-          console.error("Failed to create blob");
-          return;
-        }
-
-        // 创建下载链接
-        const url = URL.createObjectURL(blob);
-        const link = document.createElement("a");
-        link.href = url;
-        link.download = filename;
-
-        // 触发下载
-        document.body.appendChild(link);
-        link.click();
-
-        // 清理
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
-      }, "image/png");
-    } catch (e) {
-      console.error("Download failed:", e);
     }
+
+    const compressed = UPNG.encode([invertYPixels.buffer], width, height, 0);
+
+    const blob = new Blob([compressed], { type: "image/png" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = filename;
+    link.click();
+    URL.revokeObjectURL(url);
   }
 }
