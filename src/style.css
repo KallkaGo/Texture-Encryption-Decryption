@@ -46,10 +46,6 @@ h1 {
   background: #16213e;
   padding: 20px;
   border-radius: 8px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
 }
 
 canvas {

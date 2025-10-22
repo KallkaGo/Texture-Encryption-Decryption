@@ -300,10 +300,18 @@ export default class App {
     const loadingDom = document.querySelector(".loading") as HTMLDivElement;
     loadingDom.style.display = "none";
 
+    const stateDom = document.querySelector(".status") as HTMLDivElement;
+    stateDom.style.display = "block";
+
     const canvasContainer = document.querySelector(
       ".glCanvas"
     ) as HTMLDivElement;
     canvasContainer.style.display = "block";
+
+    const textureSizeText = document.getElementById(
+      "textureSizeText"
+    ) as HTMLSpanElement;
+    textureSizeText.textContent = `${this.canvas.width}x${this.canvas.height}`;
   }
 
   private bindEvents() {
@@ -326,7 +334,6 @@ export default class App {
       const { state } = this;
       els.offsetDisplay!.textContent = state.offset;
       els.offsetValue!.textContent = state.offset;
-      els.scrambleOffsetText!.textContent = state.scrambleOffset;
       els.textureSizeText!.textContent! = `${this.canvas.width}x${this.canvas.height}`;
 
       if (state.isScrambled) {
@@ -335,7 +342,6 @@ export default class App {
         (els.scrambleBtn as HTMLButtonElement).disabled = true;
         (els.restoreBtn as HTMLButtonElement).disabled = false;
       } else {
-        console.log("isScrambled", state.isScrambled);
         els.stateText!.textContent =
           state.offset === 0 ? "Original" : "Modified";
         els.stateText!.style.color = state.offset === 0 ? "#00d4ff" : "#9b59b6";
