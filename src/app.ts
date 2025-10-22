@@ -38,13 +38,7 @@ export default class App {
   private uniforms: Record<string, WebGLUniformLocation | null>;
 
   public initialize(container: HTMLDivElement) {
-    const canvas = document.createElement("canvas");
-    this.canvas = canvas;
-
-    this.gl = canvas.getContext("webgl", {
-      preserveDrawingBuffer: true,
-      antialias: true,
-    })!;
+    const { canvas } = this;
 
     container.appendChild(canvas);
 
@@ -236,7 +230,16 @@ export default class App {
     this.gl.drawArrays(this.gl.TRIANGLE_STRIP, 0, 4);
   }
 
-  public loadTextureBuffer(buffer: ArrayBuffer) {}
+  public loadTextureBuffer(buffer: ArrayBuffer) {
+    /* 
+    TODO:
+    1.设置Canvas宽高
+    2.创建Webgl纹理
+    3.设置纹理包裹模式和绑定纹理
+    4.计算offset通过uniform传入shader中
+    5.调用render函数
+    */
+  }
 
   public loadTexureImage(url: string) {
     let img = new Image();
@@ -448,8 +451,15 @@ export default class App {
       }
     }
 
-    const compressed = UPNG.encode([invertYPixels.buffer], width, height, 0);
+    
+    const compressed = UPNG.encode(
+      [invertYPixels.buffer],
+      width,
+      height,
+      256 * 0.95
+    );
 
+  
     const blob = new Blob([compressed], { type: "image/png" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
